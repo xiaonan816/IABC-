@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>90-Second Career Diagnosis - IABC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .quiz-content {
+            padding: 40px;
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question h3 {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #4facfe;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            border-color: #4facfe;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
+        }
+
+        .option.selected {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .option-emoji {
+            font-size: 1.5em;
+            margin-right: 15px;
+            min-width: 40px;
+        }
+
+        .emoji-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 2em;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .emoji-input:focus {
+            border-color: #4facfe;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 20%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-container {
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .result-section h4 {
+            color: #4facfe;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-section h4::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: #4facfe;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .result-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .result-section li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-section li:last-child {
+            border-bottom: none;
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: #e9ecef;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .website-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .website-link a {
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 30px auto 0;
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 90-Second Career Diagnosis</h1>
+            <p>Discover your personalized IABC development path</p>
+        </div>
+
+        <div class="quiz-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question-container active" id="question1">
+                <div class="question">
+                    <h3><span class="question-number">1</span>If there was a magic button that could instantly solve your biggest career dilemma, what would you wish for?</h3>
+                    <div class="options">
+                        <div class="option" data-answer="A">
+                            <span class="option-emoji">🏆</span>
+                            <span>Obtain internationally recognized industry certifications</span>
+                        </div>
+                        <div class="option" data-answer="B">
+                            <span class="option-emoji">🤝</span>
+                            <span>Build high-quality cross-Asia-Pacific region networks</span>
+                        </div>
+                        <div class="option" data-answer="C">
+                            <span class="option-emoji">🛠️</span>
+                            <span>Master cutting-edge tools like AI content generation</span>
+                        </div>
+                        <div class="option" data-answer="D">
+                            <span class="option-emoji">📈</span>
+                            <span>Upgrade from executor to strategic decision-maker</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextQuestion()" disabled id="nextBtn1">Next</button>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-container" id="question2">
+                <div class="question">
+                    <h3><span class="question-number">2</span>When was the last time you felt that you 'learned effectively'? How did you learn?</h3>
+                    <div class="options">
+                        <div class="option" data-answer="A">
+                            <span class="option-emoji">📚</span>
+                            <span>Systematic course training (e.g., IABC certification programs)</span>
+                        </div>
+                        <div class="option" data-answer="B">
+                            <span class="option-emoji">💬</span>
+                            <span>Case discussions among peers (e.g., roundtable meetings)</span>
+                        </div>
+                        <div class="option" data-answer="C">
+                            <span class="option-emoji">🔧</span>
+                            <span>Immediately applicable templates/toolkits</span>
+                        </div>
+                        <div class="option" data-answer="D">
+                            <span class="option-emoji">👨‍🏫</span>
+                            <span>One-on-one mentorship</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" disabled id="nextBtn2">Next</button>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-container" id="question3">
+                <div class="question">
+                    <h3><span class="question-number">3</span>If we were to customize an Asia-Pacific summit for you, what theme would you be most interested in?</h3>
+                    <div class="options">
+                        <div class="option" data-answer="A">
+                            <span class="option-emoji">🇸🇬</span>
+                            <span>Singapore: Conflict management in multicultural teams</span>
+                        </div>
+                        <div class="option" data-answer="B">
+                            <span class="option-emoji">🇵🇭</span>
+                            <span>Philippines: Low-cost, high-impact grassroots strategies</span>
+                        </div>
+                        <div class="option" data-answer="C">
+                            <span class="option-emoji">🇯🇵</span>
+                            <span>Japan: Z-generation content viral strategies</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" disabled id="nextBtn3">Next</button>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-container" id="question4">
+                <div class="question">
+                    <h3><span class="question-number">4</span>Use one emoji to describe your work state last week:</h3>
+                    <input type="text" class="emoji-input" id="emojiInput" placeholder="Enter an emoji 😊" maxlength="2">
+                    <p style="text-align: center; margin-top: 10px; color: #6c757d; font-size: 0.9em;">
+                        This will contribute to our live "Asia-Pacific Communicator Mood Cloud"
+                    </p>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" disabled id="nextBtn4">Next</button>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-container" id="question5">
+                <div class="question">
+                    <h3><span class="question-number">5</span>Which of the following services would you be willing to pay a premium for?</h3>
+                    <div class="options">
+                        <div class="option" data-answer="A">
+                            <span class="option-emoji">🍽️</span>
+                            <span>Lunch with industry leaders</span>
+                        </div>
+                        <div class="option" data-answer="B">
+                            <span class="option-emoji">📖</span>
+                            <span>Annual membership-exclusive resource library</span>
+                        </div>
+                        <div class="option" data-answer="C">
+                            <span class="option-emoji">✈️</span>
+                            <span>Regional chapter visit privileges</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">Previous</button>
+                    <button class="btn btn-primary" onclick="showResults()">Get My Results!</button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="result-container" id="resultContainer">
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon">🎯</div>
+                    <div class="result-title" id="resultTitle">Your Career Diagnosis Result</div>
+                </div>
+
+                <div class="result-section">
+                    <h4>🎯 Your Strengths</h4>
+                    <ul id="strengthsList"></ul>
+                </div>
+
+                <div class="result-section">
+                    <h4>🎯 IABC Custom Recommendations</h4>
+                    <ul id="recommendationsList"></ul>
+                </div>
+
+                <div class="result-section">
+                    <h4>🚀 Action Suggestion</h4>
+                    <p id="actionSuggestion"></p>
+                    
+                    <div class="qr-placeholder">
+                        [QR Code]<br>
+                        Scan to Join
+                    </div>
+                    
+                    <div class="website-link">
+                        <p>Visit our official website</p>
+                        <a href="https://www.iabcapac.com/" target="_blank">https://www.iabcapac.com/</a>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let answers = {};
+        
+        const resultProfiles = {
+            'certification_seeker': {
+                icon: '🏆',
+                title: 'Certification Seeker',
+                strengths: [
+                    'Strong desire for professional validation and recognition',
+                    'Committed to structured learning and skill development',
+                    'Values internationally recognized credentials'
+                ],
+                recommendations: [
+                    '【Priority Access】"Global Certification Acceleration Plan" + Free Trial Lesson',
+                    'Exclusive study materials for IABC certification programs',
+                    'Personalized learning roadmap with milestone tracking'
+                ],
+                action: 'Scan the QR code to access your personalized certification pathway and join our "Future Certified Professionals" community.'
+            },
+            'networking_builder': {
+                icon: '🌏',
+                title: 'Networking Builder',
+                strengths: [
+                    'Skilled at leveraging relationships to drive projects',
+                    'Highly sensitive to Asia-Pacific cultural differences',
+                    'Natural connector and relationship builder'
+                ],
+                recommendations: [
+                    '【Priority Reservation】"Cross-National Networking Blitz" Workshop on September 14',
+                    'Free access to the "Asia-Pacific 200+ Communicator Contact List"',
+                    'Exclusive Invitation Code: NETWORK15 (Summit Ticket 15% Off)'
+                ],
+                action: 'Scan the QR code to join the "Asia-Pacific Connectors" chat group and start building your network today.'
+            },
+            'tool_pragmatist': {
+                icon: '🧰',
+                title: 'Tool Pragmatist',
+                strengths: [
+                    'Focused on practical, immediately applicable solutions',
+                    'Quick adopter of new technologies and tools',
+                    'Results-oriented approach to skill development'
+                ],
+                recommendations: [
+                    'Complimentary "AI Toolkit for Communicators" resource package',
+                    'Priority access to hands-on workshop experience tickets',
+                    'Monthly tech updates and tool recommendations'
+                ],
+                action: 'Scan the QR code to download your AI toolkit and join our "Tech-Savvy Communicators" community.'
+            },
+            'cultural_decoder': {
+                icon: '🧩',
+                title: 'Cultural Decoder',
+                strengths: [
+                    'Exceptional cross-cultural communication abilities',
+                    'Strategic thinking with cultural sensitivity',
+                    'Bridge-builder between diverse teams and markets'
+                ],
+                recommendations: [
+                    'Invitation to "Cross-Cultural Excellence Training Program"',
+                    'Access to comprehensive Asia-Pacific local case library',
+                    'Mentorship opportunities with regional cultural experts'
+                ],
+                action: 'Scan the QR code to join our "Cultural Intelligence Network" and access exclusive regional insights.'
+            },
+            'strategic_rising_star': {
+                icon: '🚀',
+                title: 'Strategic Rising Star',
+                strengths: [
+                    'Strong leadership potential and strategic mindset',
+                    'Ability to see the big picture and drive transformation',
+                    'Natural mentorship and team development skills'
+                ],
+                recommendations: [
+                    'Exclusive invitation to join "Future Leaders Circle"',
+                    'One-on-one management role mentorship program',
+                    'Speaking opportunities at upcoming IABC events'
+                ],
+                action: 'Scan the QR code to join our "Leadership Pipeline" program and connect with C-suite mentors.'
+            },
+            'hybrid_talent': {
+                icon: '🎨',
+                title: 'Hybrid Talent',
+                strengths: [
+                    'Versatile skill set across multiple domains',
+                    'Adaptable to changing market demands',
+                    'Creative problem-solving abilities'
+                ],
+                recommendations: [
+                    'Comprehensive "Career Path Planning" 1-on-1 consultation',
+                    'Access to interdisciplinary skill development programs',
+                    'Flexible learning path with multiple specialization options'
+                ],
+                action: 'Scan the QR code to schedule your personalized career consultation and explore unlimited possibilities.'
+            }
+        };
+
+        function selectOption(element, questionNum) {
+            // Remove previous selections
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            // Store answer
+            answers[`q${questionNum}`] = element.dataset.answer;
+            
+            // Enable next button
+            document.getElementById(`nextBtn${questionNum}`).disabled = false;
+        }
+
+        function nextQuestion() {
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            currentQuestion++;
+            
+            if (currentQuestion <= 5) {
+                document.getElementById(`question${currentQuestion}`).classList.add('active');
+                updateProgressBar();
+            }
+        }
+
+        function prevQuestion() {
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            currentQuestion--;
+            document.getElementById(`question${currentQuestion}`).classList.add('active');
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = (currentQuestion / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function determineProfile() {
+            const q1 = answers.q1;
+            const q2 = answers.q2;
+            
+            // Logic based on the provided table
+            if (q1 === 'A' && q2 === 'A') return 'certification_seeker';
+            if (q1 === 'B' && (q2 === 'B' || q2 === 'A')) return 'networking_builder';
+            if (q1 === 'C' && (q2 === 'C' || q2 === 'B')) return 'tool_pragmatist';
+            if (q1 === 'D' || q2 === 'D') return 'cultural_decoder';
+            if (q1 === 'D' && q2 === 'D') return 'strategic_rising_star';
+            
+            // Default to hybrid talent for diverse options
+            return 'hybrid_talent';
+        }
+
+        function showResults() {
+            // Store emoji answer
+            answers.q4 = document.getElementById('emojiInput').value;
+            
+            const profile = determineProfile();
+            const result = resultProfiles[profile];
+            
+            // Hide quiz, show results
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            document.getElementById('resultContainer').classList.add('active');
+            
+            // Populate results
+            document.getElementById('resultIcon').textContent = result.icon;
+            document.getElementById('resultTitle').textContent = `🎯 Your Career Diagnosis Result: ${result.title}`;
+            
+            // Populate strengths
+            const strengthsList = document.getElementById('strengthsList');
+            strengthsList.innerHTML = '';
+            result.strengths.forEach(strength => {
+                const li = document.createElement('li');
+                li.textContent = strength;
+                strengthsList.appendChild(li);
+            });
+            
+            // Populate recommendations
+            const recommendationsList = document.getElementById('recommendationsList');
+            recommendationsList.innerHTML = '';
+            result.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recommendationsList.appendChild(li);
+            });
+            
+            // Set action suggestion
+            document.getElementById('actionSuggestion').textContent = result.action;
+            
+            // Set progress to 100%
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 1;
+            answers = {};
+            
+            // Hide results, show first question
+            document.getElementById('resultContainer').classList.remove('active');
+            document.getElementById('question1').classList.add('active');
+            
+            // Reset all selections
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('[id^="nextBtn"]').forEach(btn => btn.disabled = true);
+            document.getElementById('emojiInput').value = '';
+            
+            // Reset progress
+            updateProgressBar();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click listeners to all options
+            document.querySelectorAll('.option').forEach((option, index) => {
+                option.addEventListener('click', function() {
+                    const questionContainer = this.closest('.question-container');
+                    const questionNum = questionContainer.id.replace('question', '');
+                    selectOption(this, questionNum);
+                });
+            });
+            
+            // Emoji input listener
+            document.getElementById('emojiInput').addEventListener('input', function() {
+                const nextBtn = document.getElementById('nextBtn4');
+                nextBtn.disabled = this.value.trim() === '';
+            });
+        });
+    </script>
+</body>
+</html>
